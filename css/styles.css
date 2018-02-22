@@ -421,6 +421,145 @@ body {
   z-index: 0;
 }
 
+/* ~~~~~~~~~~~~~~~~~~~~ форма комментария ~~~~~~~~~~~~~~~~~~~~~~ */
+
+.comments__form {
+  position: absolute;
+  top: calc(4 * var(--menu-top));
+  left: calc(3 * var(--menu-left));  
+}
+
+.comments__marker {
+  position: absolute;
+  left: 0.8rem;  
+  top: -1rem;
+  width: 2.8rem;
+  height: 2.5rem;   
+  background-image: url(../i/comment.png);
+  cursor: pointer;
+}
+
+.comments__marker-checkbox {
+  position: absolute;
+  left: 0.8rem;  
+  top: -1rem;  
+  width: 2.8rem;
+  height: 2.5rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.comments__body {
+  display: none;
+  width: 27rem;
+  max-height: 32rem;
+  background-color: #384654;
+  border: 1px solid #1e2934;
+  padding: 2rem 1.5rem 2rem 2rem;
+  font-size: 1.3rem;
+  text-align: left;
+  overflow-y: scroll;
+}
+
+.comments__marker:checked {
+  border: 1px solid red;
+}
+
+.comments__marker-checkbox:checked + .comments__body {
+  display: block;
+}
+
+.comment {
+  width: 20.9rem;
+  padding: 1.3rem 0;
+}
+
+.comment + .comment {
+  border-top: 1px solid #50606e;
+}
+
+.comment__author {
+  color: #97acc0;
+  margin-bottom: 0.4rem;
+}
+
+.comment__message {
+  color: #ffffff;
+  line-height: 130%;
+}
+
+.comments__body input, .comments__body textarea {
+  border: 1px solid #8b9cad;
+  color: #8b9cad;
+}
+
+.comments__body input:focus, .comments__body textarea:focus {
+  outline: none;
+}
+
+.comments__input {
+  width: 20.9rem;
+  min-height: 4.7rem;
+  margin-bottom: 0.6rem;
+  padding: 0.8rem 1.2rem;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1.3rem;
+  color: #8b9cad;
+}
+
+.comments__close, .comments__submit {
+  width: 10rem;
+  height: 2.8rem;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  letter-spacing: 0.1rem;
+  cursor: pointer;
+}
+
+.comments__close:hover, .comments__submit:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.comments__input, .comments__submit {
+  background-color: #485561;
+}
+
+.comments__close {
+  background-color: #384654;
+  margin-right: 0.6rem;
+}
+
+.comments__input::-webkit-input-placeholder {
+  color: #8b9cad;
+}
+.comments__input::-moz-placeholder {
+  color: #8b9cad;
+}
+.comments__input:-ms-input-placeholder {
+  color: #8b9cad;
+}
+.comments__input:-moz-placeholder {
+  color: #8b9cad;
+}
+.comments__input:placeholder {
+  color: #8b9cad;
+}
+
+.comments__body::-webkit-scrollbar-track{
+  background-color: #384654;
+}
+
+.comments__body::-webkit-scrollbar{
+  width: 0.7rem;
+  background-color: #dae2ea;
+}
+
+.comments__body::-webkit-scrollbar-thumb{
+  background-color: #dae2ea;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ поделиться ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -474,6 +613,9 @@ body {
   font-size: 1.5rem;
   line-height: 130%;
 }
+
+
+
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ переключения ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ initial ~~~~~~~~~~~~~~~~~~~~~~~~~~ */

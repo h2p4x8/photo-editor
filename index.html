@@ -65,7 +65,29 @@
         <p class="error__message">Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.</p>
       </div>
       
-      <div class="">
+      <div class="comments__layer">
+        
+        <form class="comments__form">
+          <span class="comments__marker"></span><input type="checkbox" class="comments__marker-checkbox">
+          <div class="comments__body">
+            <div class="comment">
+              <p class="comment__author">Валентина</p>
+              <p class="comment__message">Здесь будет комментарий</p>
+            </div>
+            <div class="comment">
+              <p class="comment__author">Сергей</p>
+              <p class="comment__message">А здесь будет многострочный комментарий, строки на 2 хотя бы.</p>
+            </div>
+            <div class="comment">
+              <p class="comment__author">Сергей</p>
+              <p class="comment__message">А когда они будут?</p>
+            </div>
+            <textarea class="comments__input" type="text" placeholder="Напишите ответ..."></textarea>
+            <input class="comments__close" type="button" value="Закрыть">
+            <input class="comments__submit" type="submit" value="Отправить">
+          </div>
+        </form>
+        
       </div>
 
     </div>
