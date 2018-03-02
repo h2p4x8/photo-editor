@@ -48,7 +48,7 @@ body {
   cursor: pointer;
 }
 
-.wrap:before, .menu__item:before {
+.menu__item:before {
   content: '';
   display: inline-block;
   vertical-align: middle;
@@ -78,14 +78,14 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   display: block;
-  box-shadow: 1px 1.732px 10px #000000;
+  box-shadow: 0.1rem 0.17rem 1rem #000000;
   z-index: 0;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ иконки на панели ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 .drag {
-  width: 21px;
+  width: 2.1rem;
   padding: 0;
   background-color: #7b8c9c;
   background: url(../i/dotes.png) no-repeat center #7b8c9c;
@@ -94,8 +94,8 @@ body {
 
 .burger {
   padding: 0 2.1rem;
-  border-left: 1px solid #51606e;
-  border-right: 1px solid #51606e;
+  border-left: 0.1rem solid #51606e;
+  border-right: 0.1rem solid #51606e;
 }
 
 .burger-icon {
@@ -437,6 +437,7 @@ body {
   width: 2.8rem;
   height: 2.5rem;   
   background-image: url(../i/comment.png);
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
@@ -456,7 +457,7 @@ body {
   width: 27rem;
   max-height: 32rem;
   background-color: #384654;
-  border: 1px solid #1e2934;
+  border: 0.1rem solid #1e2934;
   padding: 2rem 1.5rem 2rem 2rem;
   font-size: 1.3rem;
   text-align: left;
@@ -464,7 +465,7 @@ body {
 }
 
 .comments__marker:checked {
-  border: 1px solid red;
+  border: 0.1rem solid red;
 }
 
 .comments__marker-checkbox:checked + .comments__body {
@@ -673,11 +674,9 @@ body {
 
 @keyframes pulse {
   0%, 100% {
-    /*opacity: 1;*/
     background: #fff;
   }
   50% {
-    /*opacity: 0.2;*/
     background: #6e7684;
   }
 }
