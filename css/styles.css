@@ -79,6 +79,7 @@ body {
   transform: translate(-50%, -50%);
   display: block;
   box-shadow: 1px 1.732px 10px #000000;
+  z-index: 0;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ иконки на панели ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -479,7 +480,7 @@ body {
   border-top: 1px solid #50606e;
 }
 
-.comment__author {
+.comment__time {
   color: #97acc0;
   margin-bottom: 0.4rem;
 }
@@ -598,23 +599,88 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);  
   max-width: 60rem;
-  background-color: #384654;
-  box-shadow: 1px 1.732px 10px #000000;
-  padding: 6rem 8rem;
-  color: #b5c6d6;
+  color: #fff;
+  text-shadow: 0 0 0.2rem #000;
 }
 
 .error__header {
-  font-size: 3rem;
-  margin-bottom: 2rem;
+  font-size: 4rem;
 }
 
 .error__message {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  margin-top: 2rem;
   line-height: 130%;
 }
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~ прелоадер ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+.image-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
+  max-width: 60rem;
+  z-index: 10;
+  color: #fff;
+  text-shadow: 0 0 0.2rem #000;
+}
+
+.image-loader__message {
+  font-size: 2rem;
+  margin-top: 2rem;
+}
+
+.loader {
+  height: 3rem;
+  width: 100%; 
+  min-width: 16.2rem;
+  text-align: center;
+}
+
+.loader span {
+  position: relative;
+  top: 50%;
+  display: inline-block;
+  vertical-align: top;  
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0.5rem;
+  transform: translateY(-50%);
+  background: #ffffff;
+}
+
+.image-loader .loader span {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loader span:nth-child(1) {
+  animation: pulse 1s infinite 0.2s;
+}
+.loader span:nth-child(2) {
+  animation: pulse 1s infinite 0.4s;
+}
+.loader span:nth-child(3) {
+  animation: pulse 1s infinite 0.6s;
+}
+.loader span:nth-child(4) {
+  animation: pulse 1s infinite 0.8s;
+}
+.loader span:nth-child(5) {
+  animation: pulse 1s infinite 1s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    /*opacity: 1;*/
+    background: #fff;
+  }
+  50% {
+    /*opacity: 0.2;*/
+    background: #6e7684;
+  }
+}
 
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ переключения ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
