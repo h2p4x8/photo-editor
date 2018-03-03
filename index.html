@@ -65,21 +65,41 @@
         <p class="error__message">Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.</p>
       </div>
       
+      <div class="image-loader" style="display: none;">
+        <div class="loader">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="image-loader__message">Загружаю изображение...</p>
+      </div>      
+      
       <form class="comments__form">
         <span class="comments__marker"></span><input type="checkbox" class="comments__marker-checkbox">
         <div class="comments__body">
           <div class="comment">
-            <p class="comment__author">Валентина</p>
+            <p class="comment__time">28.02.18 19:09:33</p>
             <p class="comment__message">Здесь будет комментарий</p>
           </div>
           <div class="comment">
-            <p class="comment__author">Сергей</p>
+            <p class="comment__time">28.02.18 19:11:01</p>
             <p class="comment__message">А здесь будет многострочный комментарий, строки на 2 хотя бы.</p>
           </div>
           <div class="comment">
-            <p class="comment__author">Сергей</p>
+            <p class="comment__time">28.02.18 23:58:01</p>
             <p class="comment__message">А когда они будут?</p>
           </div>
+          <div class="comment">
+            <div class="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>            
+          </div>          
           <textarea class="comments__input" type="text" placeholder="Напишите ответ..."></textarea>
           <input class="comments__close" type="button" value="Закрыть">
           <input class="comments__submit" type="submit" value="Отправить">

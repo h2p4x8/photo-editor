@@ -48,7 +48,7 @@ body {
   cursor: pointer;
 }
 
-.wrap:before, .menu__item:before {
+.menu__item:before {
   content: '';
   display: inline-block;
   vertical-align: middle;
@@ -78,13 +78,14 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   display: block;
-  box-shadow: 1px 1.732px 10px #000000;
+  box-shadow: 0.1rem 0.17rem 1rem #000000;
+  z-index: 0;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ иконки на панели ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 .drag {
-  width: 21px;
+  width: 2.1rem;
   padding: 0;
   background-color: #7b8c9c;
   background: url(../i/dotes.png) no-repeat center #7b8c9c;
@@ -93,8 +94,8 @@ body {
 
 .burger {
   padding: 0 2.1rem;
-  border-left: 1px solid #51606e;
-  border-right: 1px solid #51606e;
+  border-left: 0.1rem solid #51606e;
+  border-right: 0.1rem solid #51606e;
 }
 
 .burger-icon {
@@ -436,6 +437,7 @@ body {
   width: 2.8rem;
   height: 2.5rem;   
   background-image: url(../i/comment.png);
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
@@ -455,7 +457,7 @@ body {
   width: 27rem;
   max-height: 32rem;
   background-color: #384654;
-  border: 1px solid #1e2934;
+  border: 0.1rem solid #1e2934;
   padding: 2rem 1.5rem 2rem 2rem;
   font-size: 1.3rem;
   text-align: left;
@@ -463,7 +465,7 @@ body {
 }
 
 .comments__marker:checked {
-  border: 1px solid red;
+  border: 0.1rem solid red;
 }
 
 .comments__marker-checkbox:checked + .comments__body {
@@ -479,7 +481,7 @@ body {
   border-top: 1px solid #50606e;
 }
 
-.comment__author {
+.comment__time {
   color: #97acc0;
   margin-bottom: 0.4rem;
 }
@@ -598,23 +600,86 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);  
   max-width: 60rem;
-  background-color: #384654;
-  box-shadow: 1px 1.732px 10px #000000;
-  padding: 6rem 8rem;
-  color: #b5c6d6;
+  color: #fff;
+  text-shadow: 0 0 0.2rem #000;
 }
 
 .error__header {
-  font-size: 3rem;
-  margin-bottom: 2rem;
+  font-size: 4rem;
 }
 
 .error__message {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  margin-top: 2rem;
   line-height: 130%;
 }
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~ прелоадер ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+.image-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
+  max-width: 60rem;
+  z-index: 10;
+  color: #fff;
+  text-shadow: 0 0 0.2rem #000;
+}
+
+.image-loader__message {
+  font-size: 2rem;
+  margin-top: 2rem;
+}
+
+.loader {
+  height: 3rem;
+  width: 100%; 
+  min-width: 16.2rem;
+  text-align: center;
+}
+
+.loader span {
+  position: relative;
+  top: 50%;
+  display: inline-block;
+  vertical-align: top;  
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0.5rem;
+  transform: translateY(-50%);
+  background: #ffffff;
+}
+
+.image-loader .loader span {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loader span:nth-child(1) {
+  animation: pulse 1s infinite 0.2s;
+}
+.loader span:nth-child(2) {
+  animation: pulse 1s infinite 0.4s;
+}
+.loader span:nth-child(3) {
+  animation: pulse 1s infinite 0.6s;
+}
+.loader span:nth-child(4) {
+  animation: pulse 1s infinite 0.8s;
+}
+.loader span:nth-child(5) {
+  animation: pulse 1s infinite 1s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    background: #fff;
+  }
+  50% {
+    background: #6e7684;
+  }
+}
 
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ переключения ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
