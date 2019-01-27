@@ -16,10 +16,11 @@
           <i class="burger-icon"></i>
         </li>
 
-        <li class="menu__item mode new">
+        <label for= "fileInput" class="menu__item mode new">
           <i class="menu__icon new-icon"></i>
           <span class="menu__item-title">Загрузить<br>новое</span>
-        </li>
+          <input type="file" id="fileInput">
+        </label>
 
         <li class="menu__item mode comments" data-state="">
           <i class="menu__icon comments-icon"></i>
@@ -56,12 +57,12 @@
       </ul>
 
       <img class="current-image" src="./pic/image.jpg">
-      
+
       <div class="error" style="display: none;">
         <h4 class="error__header">Ошибка</h4>
         <p class="error__message">Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.</p>
       </div>
-      
+
       <div class="image-loader" style="display: none;">
         <div class="loader">
           <span></span>
@@ -71,8 +72,8 @@
           <span></span>
         </div>
         <p class="image-loader__message">Загружаю изображение...</p>
-      </div>      
-      
+      </div>
+
       <form class="comments__form">
         <span class="comments__marker"></span><input type="checkbox" class="comments__marker-checkbox">
         <div class="comments__body">
@@ -95,8 +96,8 @@
               <span></span>
               <span></span>
               <span></span>
-            </div>            
-          </div>          
+            </div>
+          </div>
           <textarea class="comments__input" type="text" placeholder="Напишите ответ..."></textarea>
           <input class="comments__close" type="button" value="Закрыть">
           <input class="comments__submit" type="submit" value="Отправить">
