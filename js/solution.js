@@ -16,6 +16,8 @@ class ImageEditor {
     this.image = this.editor.querySelector('.current-image');
     this.downloadNew = this.menu.querySelector('.new');
     this.burgerButton = this.menu.querySelector('.burger');
+    this.menuToggle = this.menu.querySelectorAll('.menu__toggle');
+    this.commentForm = this.editor.querySelector('.comments__form');
     //this.comments = this.menu.querySelector('.comments')
     //this.draw
     this.registerEvents();
@@ -46,6 +48,20 @@ class ImageEditor {
       }
       el.addEventListener('click', event => this.showInnerEl(event))
     });
+    this.menuToggle.forEach((el) => {
+      el.addEventListener('change', ()=>{
+        if (el.checked) {
+          this.showComments(el.value)
+        }
+        return;
+      })
+    })
+    this.editor.addEventListener('click', (event)=>{
+      if (this.editor.querySelector('#comments-on').checked){
+        this.makeCommentForm(event, event.pageXt, event.pageY);
+      }
+      return;
+    })
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
@@ -100,6 +116,24 @@ class ImageEditor {
     })
     e.currentTarget.style.display = 'inline-block';
     e.currentTarget.nextElementSibling.style.display = 'inline-block';
+  }
+  showComments(value) {
+    const comments = document.querySelectorAll('.comments__form');
+    if (value === 'off') {
+      comments.forEach(el => el.style.display = 'none')
+    } else {
+      comments.forEach(el => el.style.display = 'block')
+    }
+  }
+  makeCommentForm(e) {
+    const newForm = this.commentForm.cloneNode(true);
+    //откуда?
+    let x = e.pageX - 20,
+        y = e.pageY - 2;
+
+    newForm.style.left = x + 'px';
+    newForm.style.top = y + 'px';
+    this.editor.appendChild(newForm);
   }
 }
 
