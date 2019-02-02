@@ -25,7 +25,6 @@ class ImageEditor {
     this.registerEvents();
     this.makeCanvas();
   }
-
   registerEvents() {
     this.menu.addEventListener('mousedown', event => this.dragStart(event));
     this.menu.addEventListener('mousemove', event => this.dragObj(event));
@@ -60,7 +59,7 @@ class ImageEditor {
       })
     })
     this.editor.addEventListener('click', (event)=>{
-      if (event.target !== this.menu  && this.editor.querySelector('#comments-on').checked && !this.isDrawing) {
+      if ((event.target === this.editor || event.target === this.image) && this.editor.querySelector('#comments-on').checked && !this.isDrawing) {
         this.makeCommentForm(event, event.pageXt, event.pageY);
       }
       return;
@@ -180,6 +179,11 @@ class ImageEditor {
     sendBtn.classList.add('comments__submit');
     sendBtn.type = 'submit';
     sendBtn.value = 'Отправить';
+    sendBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      newComBody.insertBefore(this.newComment(newText.value), newComment);
+      newText.value = '';
+    })
 
     newForm.appendChild(newSpan);
     newForm.appendChild(newCheckbox);
@@ -230,11 +234,13 @@ class ImageEditor {
     let weird = false;
     let needsRepaint = false;
 
+
+
     function circle(point) {
       ctx.beginPath();
-      ctx.fillStyle = color;
       ctx.arc(...point, BRUSH_RADIUS / 2, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.fillStyle = color;
     }
 
     function smoothCurveBetween (p1, p2) {
@@ -245,10 +251,10 @@ class ImageEditor {
     function smoothCurve(points) {
       ctx.beginPath();
       ctx.lineWidth = BRUSH_RADIUS;
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
 
       ctx.moveTo(...points[0]);
 
@@ -304,6 +310,23 @@ class ImageEditor {
     }
 
     tick();
+  }
+  newComment(text) {
+    const comment = document.createElement('div');
+    comment.classList.add('comment');
+
+    const time = document.createElement('p');
+    time.classList.add('comment__time');
+    time.textContent = new Date().toLocaleString('ru-Ru');
+
+    const message = document.createElement('p');
+    message.classList.add('comment__message');
+    message.textContent = text;
+
+    comment.appendChild(time);
+    comment.appendChild(message);
+
+    return comment;
   }
 }
 
