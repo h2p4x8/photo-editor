@@ -23,6 +23,8 @@ class ImageEditor {
     this.isDrawing = false;
     this.drawTools = this.menu.querySelectorAll('.menu__color');
     this.loader = this.editor.querySelector('.image-loader');
+    this.share = this.menu.querySelector('.share');
+    this.menuUrl = this.menu.querySelector('.menu__url');
     this.registerEvents();
     this.makeCanvas();
   }
@@ -77,6 +79,7 @@ class ImageEditor {
         }
       })
     }
+    this.share.addEventListener('click', this.generateURL)
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
@@ -368,7 +371,6 @@ class ImageEditor {
 
   }
   sendCom(message, position, loader) {
-    console.log(loader)
     const post = 'message=' + encodeURIComponent(message) +
     '&left=' + encodeURIComponent(position.left) + '&top=' + encodeURIComponent(position.top);
 
@@ -406,6 +408,11 @@ class ImageEditor {
     xhr.addEventListener('error', () => {
       console.log('error');
     })
+  }
+  generateURL() {
+    const url = window.location.toString();
+
+    console.log(window.location.pathname)
   }
 }
 
