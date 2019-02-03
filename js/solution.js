@@ -22,6 +22,7 @@ class ImageEditor {
     this.draw = this.menu.querySelector('.draw');
     this.isDrawing = false;
     this.drawTools = this.menu.querySelectorAll('.menu__color');
+    this.loader = this.editor.querySelector('.image-loader');
     this.registerEvents();
     this.makeCanvas();
   }
@@ -115,8 +116,7 @@ class ImageEditor {
       this.refreshCanvas();
     });
     //кидать на сервер
-    //this.sendImage();
-
+    this.sendPic(img);
   }
   showMenu () {
     this.isDrawing = false;
@@ -147,6 +147,13 @@ class ImageEditor {
 
     const newForm = document.createElement('form');
     newForm.classList.add('comments__form');
+
+    var x = e.pageX - 20,
+        y = e.pageY - 2;
+
+    newForm.style.left = x + 'px';
+    newForm.style.top = y + 'px';
+
     const newSpan = document.createElement('span');
     newSpan.classList.add('comments__marker');
     const newCheckbox = document.createElement('input');
@@ -182,6 +189,10 @@ class ImageEditor {
     sendBtn.addEventListener('click', (event) => {
       event.preventDefault();
       newComBody.insertBefore(this.newComment(newText.value), newComment);
+      this.sendCom(newText.value, {
+        left: x,
+        top: y
+      }, newComment);
       newText.value = '';
     })
 
@@ -197,12 +208,7 @@ class ImageEditor {
     newComBody.appendChild(closeBtn);
     newComBody.appendChild(sendBtn);
 
-    //откуда?
-    let x = e.pageX - 20,
-        y = e.pageY - 2;
 
-    newForm.style.left = x + 'px';
-    newForm.style.top = y + 'px';
     this.editor.appendChild(newForm);
   }
   showComForm() {
@@ -327,6 +333,79 @@ class ImageEditor {
     comment.appendChild(message);
 
     return comment;
+  }
+  sendPic(pic) {
+    const post = new FormData();
+    post.append('title', 'somePic')
+    post.append('image', pic, 'somePic.jpg');
+
+    /*fetch('https://neto-api.herokuapp.com/pic', {
+      method: 'POST',
+      body: post
+      })
+      .then((res) => {
+        return res.json()
+      })
+      .then((res) => {
+        this.imageInfo = res;
+      })
+      .catch((e) => {
+        console.log('Error: ' + e)
+      })*/
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://neto-api.herokuapp.com/pic');
+      xhr.addEventListener("loadstart", () => {
+        this.loader.style.display = 'block';
+      })
+      xhr.send(post);
+      xhr.addEventListener("loadend", () => {
+        this.loader.style.display = 'none';
+      });
+      xhr.addEventListener("load", () => {
+        this.imageInfo = JSON.parse(xhr.responseText);
+      });
+
+  }
+  sendCom(message, position, loader) {
+    console.log(loader)
+    const post = 'message=' + encodeURIComponent(message) +
+    '&left=' + encodeURIComponent(position.left) + '&top=' + encodeURIComponent(position.top);
+
+    /*fetch(`https://neto-api.herokuapp.com/pic/${this.imageInfo.id}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: post
+    })
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      this.imageInfo = res;
+      console.log(res);
+    })
+    .catch((e) => {
+      console.log('Error: ' + e);
+    })*/
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://neto-api.herokuapp.com/pic/${this.imageInfo.id}/comments`);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    xhr.addEventListener("loadstart", () => {
+      loader.style.display = 'block';
+    })
+    xhr.send(post);
+    xhr.addEventListener("loadend", () => {
+      loader.style.display = 'none';
+    });
+    xhr.addEventListener("load", () => {
+      this.imageInfo = JSON.parse(xhr.responseText);
+    });
+    xhr.addEventListener('error', () => {
+      console.log('error');
+    })
   }
 }
 
