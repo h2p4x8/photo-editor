@@ -25,6 +25,7 @@ class ImageEditor {
     this.loader = this.editor.querySelector('.image-loader');
     this.share = this.menu.querySelector('.share');
     this.menuUrl = this.menu.querySelector('.menu__url');
+    this.imageInfo = null;
     this.registerEvents();
     this.makeCanvas();
   }
@@ -79,7 +80,6 @@ class ImageEditor {
         }
       })
     }
-    this.share.addEventListener('click', this.generateURL)
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
@@ -367,6 +367,10 @@ class ImageEditor {
       });
       xhr.addEventListener("load", () => {
         this.imageInfo = JSON.parse(xhr.responseText);
+        this.generateURL();
+        this.showInnerEl({
+          currentTarget: this.share
+        })
       });
 
   }
@@ -411,12 +415,11 @@ class ImageEditor {
   }
   generateURL() {
     const url = window.location.toString();
-
-    console.log(window.location.pathname)
+    this.menuUrl.value = url + `${this.imageInfo.id}`
   }
 }
 
-new ImageEditor( document.querySelector('.wrap') );
+let i = new ImageEditor( document.querySelector('.wrap') );
 
 function throttle(callback) {
   let isWaiting = false;
