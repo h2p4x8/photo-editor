@@ -28,6 +28,7 @@ class ImageEditor {
     this.imageInfo = null;
     this.registerEvents();
     this.makeCanvas();
+    this.isNew();
   }
   registerEvents() {
     this.menu.addEventListener('mousedown', event => this.dragStart(event));
@@ -417,9 +418,30 @@ class ImageEditor {
     const url = window.location.toString();
     this.menuUrl.value = url + `${this.imageInfo.id}`
   }
+  isNew() {
+    if (!this.imageInfo) {
+      this.startNew();
+      return;
+    }
+    const id = window.location.path;
+    //this.loadImage(id)
+  }
+  startNew() {
+    this.burgerButton.style.display = 'none';
+    this.modeButtons.forEach((el) => {
+      if (el.classList.contains('new')) {
+          return;
+      }
+      el.style.display = 'none'
+    })
+    this.image.src = '';
+    document.querySelectorAll('.comments__form').forEach(( el ) => {
+      el.remove()
+    })
+  }
 }
 
-let i = new ImageEditor( document.querySelector('.wrap') );
+new ImageEditor( document.querySelector('.wrap') );
 
 function throttle(callback) {
   let isWaiting = false;
