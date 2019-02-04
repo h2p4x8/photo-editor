@@ -415,15 +415,25 @@ class ImageEditor {
     })
   }
   generateURL() {
-    const url = window.location.toString();
-    this.menuUrl.value = url + `${this.imageInfo.id}`
+    this.menuUrl.value = window.location + '?id=' + this.imageInfo.id;
   }
   isNew() {
-    if (!this.imageInfo) {
+    const linkEx = /id=/g;
+
+    if(linkEx.test(window.location.href)) {
+
+      let regExp = /id=.+/gm;
+      let resultId  = regExp.exec(his.menuUrl.value);
+      resultId = resultId[0].replace('id=', '');
+
+      console.log(resultId)
+    }
+    this.startNew();
+    /*if (!this.imageInfo) {
       this.startNew();
       return;
     }
-    const id = window.location.path;
+    const id = window.location.path;*/
     //this.loadImage(id)
   }
   startNew() {
