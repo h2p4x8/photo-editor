@@ -152,8 +152,8 @@ class ImageEditor {
     const newForm = document.createElement('form');
     newForm.classList.add('comments__form');
 
-    var x = e.pageX - 20,
-        y = e.pageY - 2;
+    var x = e.pageX,
+        y = e.pageY;
 
     newForm.style.left = x + 'px';
     newForm.style.top = y + 'px';
@@ -192,11 +192,7 @@ class ImageEditor {
     sendBtn.value = 'Отправить';
     sendBtn.addEventListener('click', (event) => {
       event.preventDefault();
-      newComBody.insertBefore(this.newComment(newText.value), newComment);
-      this.sendCom(newText.value, {
-        left: x,
-        top: y
-      }, newComment);
+      this.sendCom(newText.value, newForm);
       newText.value = '';
     })
 
@@ -214,6 +210,8 @@ class ImageEditor {
 
 
     this.editor.appendChild(newForm);
+
+    return newForm;
   }
   showComForm() {
     const forms = document.querySelectorAll('.comments__marker-checkbox');
@@ -223,16 +221,24 @@ class ImageEditor {
   }
   makeCanvas() {
     const ctx = document.createElement('canvas');
+    const mask = document.createElement('img');
+
+    this.mask = mask;
     this.ctx = ctx;
-    ctx.style.position = 'absolute';
+
+    mask.style.position = ctx.style.position = 'absolute';
+
     this.editor.appendChild(ctx);
+    this.editor.appendChild(mask);
+
   }
   refreshCanvas() {
     const bounds = this.image.getBoundingClientRect();
-    this.ctx.style.top = bounds.top + 'px';
-    this.ctx.style.left = bounds.left + 'px';
-    this.ctx.width = this.image.offsetWidth;
-    this.ctx.height = this.image.offsetHeight;
+
+    this.ctx.style.top = this.mask.style.top = bounds.top + 'px';
+    this.ctx.style.left = this.mask.style.left = bounds.left + 'px';
+    this.ctx.width = this.mask.width = this.image.offsetWidth;
+    this.ctx.height = this.mask.height = this.image.offsetHeight;
   }
   drawing(color) {
     const ctx = this.ctx.getContext('2d');
@@ -321,13 +327,13 @@ class ImageEditor {
 
     tick();
   }
-  newComment(text) {
+  newComment(text, timestamp) {
     const comment = document.createElement('div');
     comment.classList.add('comment');
 
     const time = document.createElement('p');
     time.classList.add('comment__time');
-    time.textContent = new Date().toLocaleString('ru-Ru');
+    time.textContent = new Date(timestamp).toLocaleString('ru-Ru');
 
     const message = document.createElement('p');
     message.classList.add('comment__message');
@@ -372,12 +378,13 @@ class ImageEditor {
         this.showInnerEl({
           currentTarget: this.share
         })
+        this.webSocket();
       });
 
   }
-  sendCom(message, position, loader) {
+  sendCom(message, form) {
     const post = 'message=' + encodeURIComponent(message) +
-    '&left=' + encodeURIComponent(position.left) + '&top=' + encodeURIComponent(position.top);
+    '&left=' + encodeURIComponent(form.style.left.replace('px', '')) + '&top=' + encodeURIComponent(form.style.top.replace('px', ''));
 
     /*fetch(`https://neto-api.herokuapp.com/pic/${this.imageInfo.id}/comments`, {
       method: 'POST',
@@ -396,6 +403,8 @@ class ImageEditor {
     .catch((e) => {
       console.log('Error: ' + e);
     })*/
+    let loader = form.querySelectorAll('.comment');
+    loader = loader[loader.length - 1];
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `https://neto-api.herokuapp.com/pic/${this.imageInfo.id}/comments`);
@@ -404,11 +413,18 @@ class ImageEditor {
       loader.style.display = 'block';
     })
     xhr.send(post);
-    xhr.addEventListener("loadend", () => {
+    /*xhr.addEventListener("loadend", () => {
       loader.style.display = 'none';
-    });
+    });*/
     xhr.addEventListener("load", () => {
-      this.imageInfo = JSON.parse(xhr.responseText);
+      const result = JSON.parse(xhr.responseText);
+      this.imageInfo = result;
+      /*const keys = Object.keys(result.comments)
+      for (var i = 0; i < keys.length; i++) {
+        if (result.comments[keys[i]].message === message) {
+          form.setAttribute('id', keys[i])
+        }
+      }*/
     });
     xhr.addEventListener('error', () => {
       console.log('error');
@@ -449,9 +465,50 @@ class ImageEditor {
       el.remove()
     })
   }
+  webSocket() {
+    var socket = this.socket = new WebSocket(`wss://neto-api.herokuapp.com/pic/${this.imageInfo.id}`);
+    socket.addEventListener('open', () => {
+      console.log(`'WS's open`);
+    })
+
+    socket.addEventListener('message', (event) => {
+      let answer = JSON.parse(event.data);
+      if (answer.event === 'comment') {
+        console.log(answer.comment)
+        const comments = Array.from(document.querySelectorAll('.comments__form'));
+        let result = comments.find(( el ) => {
+          if ((el.style.left.replace('px', '') == answer.comment.left) && (el.style.top.replace('px', '') == answer.comment.top)) {
+            return el;
+          }
+        })
+        if (!result) {
+          result = this.makeCommentForm({
+            pageX: answer.comment.left,
+            pageY: answer.comment.top
+          })
+        }
+        result = result.querySelector('.comments__body');
+        const newComment = this.newComment(answer.comment.message, answer.comment.timestamp);
+        let loader = result.querySelectorAll('.comment');
+        loader = loader[loader.length - 1];
+        result.insertBefore(newComment, loader);
+        loader.style.display = 'none';
+      } else if (answer.event === 'pic') {
+        this.imageInfo = answer.pic;
+      } else if (answer.event === 'mask') {
+        this.mask.src = answer.url;
+      } else if (answer.event === 'error') {
+        console.log(answer.message)
+      } else {
+        console.log(answer)
+      }
+    })
+
+    //событие еррор
+  }
 }
 
-new ImageEditor( document.querySelector('.wrap') );
+let i = new ImageEditor( document.querySelector('.wrap') );
 
 function throttle(callback) {
   let isWaiting = false;
