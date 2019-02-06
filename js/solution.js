@@ -228,8 +228,8 @@ class ImageEditor {
 
     mask.style.position = ctx.style.position = 'absolute';
 
-    this.editor.appendChild(ctx);
     this.editor.appendChild(mask);
+    this.editor.appendChild(ctx);
 
   }
   refreshCanvas() {
@@ -241,7 +241,12 @@ class ImageEditor {
     this.ctx.height = this.mask.height = this.image.offsetHeight;
   }
   drawing(color) {
-    const ctx = this.ctx.getContext('2d');
+    const canvas = this.ctx;
+    const socket = this.socket;
+    const sendMask = debounce(() => {
+      canvas.toBlob(blob => socket.send(blob))
+    }, 100)
+    const ctx = canvas.getContext('2d');
     const w = ctx.width,
           h = ctx.height;
     const BRUSH_RADIUS = 4;
@@ -305,6 +310,7 @@ class ImageEditor {
         const point = [evt.offsetX, evt.offsetY]
         curves[curves.length - 1].push(point);
         needsRepaint = true;
+        sendMask();
       }
     });
 
@@ -321,7 +327,6 @@ class ImageEditor {
         repaint();
         needsRepaint = false;
       }
-
       window.requestAnimationFrame(tick);
     }
 
@@ -431,26 +436,19 @@ class ImageEditor {
     })
   }
   generateURL() {
+    //создавать чистую новую ссылку
     this.menuUrl.value = window.location + '?id=' + this.imageInfo.id;
   }
   isNew() {
     const linkEx = /id=/g;
 
     if(linkEx.test(window.location.href)) {
+      let resultId  = window.location.search;
+      resultId = resultId.replace('?id=', '');
 
-      let regExp = /id=.+/gm;
-      let resultId  = regExp.exec(his.menuUrl.value);
-      resultId = resultId[0].replace('id=', '');
-
-      console.log(resultId)
+      this.getImage(resultId)
     }
     this.startNew();
-    /*if (!this.imageInfo) {
-      this.startNew();
-      return;
-    }
-    const id = window.location.path;*/
-    //this.loadImage(id)
   }
   startNew() {
     this.burgerButton.style.display = 'none';
@@ -474,25 +472,7 @@ class ImageEditor {
     socket.addEventListener('message', (event) => {
       let answer = JSON.parse(event.data);
       if (answer.event === 'comment') {
-        console.log(answer.comment)
-        const comments = Array.from(document.querySelectorAll('.comments__form'));
-        let result = comments.find(( el ) => {
-          if ((el.style.left.replace('px', '') == answer.comment.left) && (el.style.top.replace('px', '') == answer.comment.top)) {
-            return el;
-          }
-        })
-        if (!result) {
-          result = this.makeCommentForm({
-            pageX: answer.comment.left,
-            pageY: answer.comment.top
-          })
-        }
-        result = result.querySelector('.comments__body');
-        const newComment = this.newComment(answer.comment.message, answer.comment.timestamp);
-        let loader = result.querySelectorAll('.comment');
-        loader = loader[loader.length - 1];
-        result.insertBefore(newComment, loader);
-        loader.style.display = 'none';
+        this.checkAndMake(answer.comment)
       } else if (answer.event === 'pic') {
         this.imageInfo = answer.pic;
       } else if (answer.event === 'mask') {
@@ -506,19 +486,75 @@ class ImageEditor {
 
     //событие еррор
   }
+  getImage(id) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `https://neto-api.herokuapp.com/pic/${id}`);
+    xhr.send();
+    xhr.addEventListener("load", () => {
+      this.imageInfo = JSON.parse(xhr.responseText);
+      //картинка
+      this.image.src = this.imageInfo.url;
+      //добавляем комментарии
+      if (this.imageInfo.comments) {
+        const keys = Object.keys(this.imageInfo.comments)
+        for (var i = 0; i < keys.length; i++) {
+          this.checkAndMake(this.imageInfo.comments[keys[i]])
+        }
+      }
+      if(this.imageInfo.mask) {
+        this.mask.src = this.imageInfo.mask;
+      }
+      this.webSocket();
+      this.image.addEventListener('load', () => {
+        this.refreshCanvas()
+        this.showMenu();
+      })
+    });
+  }
+  checkAndMake(comment) {
+    const comments = Array.from(document.querySelectorAll('.comments__form'));
+    let result = comments.find(( el ) => {
+      if ((el.style.left.replace('px', '') == comment.left) && (el.style.top.replace('px', '') == comment.top)) {
+        return el;
+      }
+    })
+    if (!result) {
+      result = this.makeCommentForm({
+        pageX: comment.left,
+        pageY: comment.top
+      })
+    }
+    result = result.querySelector('.comments__body');
+    const newComment = this.newComment(comment.message, comment.timestamp);
+    let loader = result.querySelectorAll('.comment');
+    loader = loader[loader.length - 1];
+    result.insertBefore(newComment, loader);
+    loader.style.display = 'none';
+  }
 }
 
 let i = new ImageEditor( document.querySelector('.wrap') );
 
-function throttle(callback) {
-  let isWaiting = false;
-  return function () {
-    if (!isWaiting) {
-      callback.apply(this, arguments);
-      isWaiting = true;
-      requestAnimationFrame(() => {
-        isWaiting = false;
-      });
-    }
+function debounce(callback, delay = 0) {
+  let timeout;
+  return () => {
+  	clearTimeout(timeout);
+  	timeout = setTimeout(() => {
+  		timeout = null;
+  		callback();
+  	}, delay);
   }
+}
+
+function throttle(callback, delay) {
+let isWaiting = false;
+return function () {
+if (!isWaiting) {
+callback.apply(this, arguments);
+isWaiting = true;
+setTimeout(() => {
+isWaiting = false;
+}, delay);
+}
+}
 }
