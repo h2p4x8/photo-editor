@@ -30,9 +30,11 @@ class ImageEditor {
     this.share = this.menu.querySelector('.share');
     this.menuUrl = this.menu.querySelector('.menu__url');
     this.commentsMode = this.menu.querySelector('.comments');
+    this.copyButton = this.menu.querySelector('.menu_copy');
     this.registerEvents();
     this.makeCanvas();
     this.isNew();
+
   }
   registerEvents() {
     this.menu.addEventListener('mousedown', event => this.dragStart(event));
@@ -87,6 +89,18 @@ class ImageEditor {
     }
     this.commentsMode.addEventListener('click', ()=>{
       this.isComment = true;
+    })
+    this.copyButton.addEventListener('click', () => {
+      event.preventDefault();
+      this.menuUrl.select();
+      document.execCommand('copy');
+    })
+    window.addEventListener('resize', () => {
+      console.log('s')
+      const resize = throttle(()=> {
+        this.refreshCanvas();
+      })
+      resize();
     })
   }
   showError(isShow = true, isWrongType = true) {
@@ -459,6 +473,7 @@ class ImageEditor {
     })
   }
   generateURL() {
+    console.log()
     this.menuUrl.value = window.location.host + '?id=' + this.imageInfo.id;
   }
   isNew() {
@@ -518,6 +533,9 @@ class ImageEditor {
   getImage(id) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', `https://neto-api.herokuapp.com/pic/${id}`);
+    xhr.addEventListener("loadstart", () => {
+      this.loader.style.display = 'block';
+    })
     xhr.send();
     xhr.addEventListener("load", () => {
       this.imageInfo = JSON.parse(xhr.responseText);
@@ -535,10 +553,14 @@ class ImageEditor {
       }
       this.webSocket();
       this.image.addEventListener('load', () => {
+        this.loader.style.display = 'none';
         this.refreshCanvas()
-        this.showMenu();
+        this.showInnerEl({
+          currentTarget: this.commentsMode
+        })
       })
       this.generateURL();
+
     });
   }
   checkAndMake(comment) {
@@ -585,15 +607,15 @@ function debounce(callback, delay = 0) {
   }
 }
 
-function throttle(callback, delay) {
+function throttle(callback) {
 let isWaiting = false;
 return function () {
 if (!isWaiting) {
 callback.apply(this, arguments);
 isWaiting = true;
-setTimeout(() => {
+requestAnimationFrame(() => {
 isWaiting = false;
-}, delay);
+});
 }
 }
 }
