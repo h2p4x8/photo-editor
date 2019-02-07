@@ -10,7 +10,11 @@ class ImageEditor {
     this.dragTools = {
       movedPiece: null,
       shiftX: 0,
-      shiftY: 0
+      shiftY: 0,
+      minX: 0,
+      minY: 0,
+      maxX: 0,
+      maxY: 0
     }
     this.modeButtons = this.menu.querySelectorAll('.mode');
     this.image = this.editor.querySelector('.current-image');
@@ -18,14 +22,14 @@ class ImageEditor {
     this.burgerButton = this.menu.querySelector('.burger');
     this.menuToggle = this.menu.querySelectorAll('.menu__toggle');
     this.commentForm = this.editor.querySelector('.comments__form');
-    //this.comments = this.menu.querySelector('.comments')
     this.draw = this.menu.querySelector('.draw');
     this.isDrawing = false;
+    this.isComment = false;
     this.drawTools = this.menu.querySelectorAll('.menu__color');
     this.loader = this.editor.querySelector('.image-loader');
     this.share = this.menu.querySelector('.share');
     this.menuUrl = this.menu.querySelector('.menu__url');
-    this.imageInfo = null;
+    this.commentsMode = this.menu.querySelector('.comments');
     this.registerEvents();
     this.makeCanvas();
     this.isNew();
@@ -64,8 +68,8 @@ class ImageEditor {
       })
     })
     this.editor.addEventListener('click', (event)=>{
-      if ((event.target === this.editor || event.target === this.image) && this.editor.querySelector('#comments-on').checked && !this.isDrawing) {
-        this.makeCommentForm(event, event.pageXt, event.pageY);
+      if (this.isComment && (event.target === this.editor || event.target === this.ctx)) {
+        this.makeCommentForm(event, event.pageX, event.pageY);
       }
       return;
     })
@@ -81,6 +85,9 @@ class ImageEditor {
         }
       })
     }
+    this.commentsMode.addEventListener('click', ()=>{
+      this.isComment = true;
+    })
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
@@ -92,6 +99,10 @@ class ImageEditor {
       const bounds = e.target.getBoundingClientRect();
       this.dragTools.shiftX = e.pageX - bounds.left - window.pageXOffset;
       this.dragTools.shiftY = e.pageY - bounds.top - window.pageYOffset;
+      this.dragTools.minY = this.editor.offsetTop;
+      this.dragTools.minX = this.editor.offsetLeft;
+      this.dragTools.maxX = this.editor.offsetLeft + this.editor.offsetWidth - this.dragTools.movedPiece.offsetWidth;
+      this.dragTools.maxY = this.editor.offsetTop + this.editor.offsetHeight - this.dragTools.movedPiece.offsetHeight;
     }
   }
   dragObj( e ) {
@@ -100,8 +111,14 @@ class ImageEditor {
       e.preventDefault();
       let x = e.pageX - this.dragTools.shiftX,
           y = e.pageY - this.dragTools.shiftY;
+      x = Math.min(x, this.dragTools.maxX);
+      y = Math.min(y, this.dragTools.maxY);
+      x = Math.max(x, this.dragTools.minX);
+      y = Math.max(y, this.dragTools.minY);
       this.dragTools.movedPiece.style.left = x + 'px';
       this.dragTools.movedPiece.style.top = y + 'px';
+      sessionStorage.setItem('menuPosLeft', x);
+      sessionStorage.setItem('menuPosTop', y);
     }
   }
   loadImage ( e ){
@@ -124,6 +141,7 @@ class ImageEditor {
   }
   showMenu () {
     this.isDrawing = false;
+    this.isComment = false;
     this.burgerButton.style.display = 'none';
     this.modeButtons.forEach( (el) => {
       el.style.display = 'inline-block';
@@ -142,8 +160,10 @@ class ImageEditor {
     const comments = document.querySelectorAll('.comments__form');
     if (value === 'off') {
       comments.forEach(el => el.style.display = 'none')
+      this.isComment = false;
     } else {
       comments.forEach(el => el.style.display = 'block')
+      this.isComment = true;
     }
   }
   makeCommentForm(e) {
@@ -182,9 +202,10 @@ class ImageEditor {
     closeBtn.classList.add('comments__close');
     closeBtn.type = 'button';
     closeBtn.value = 'Закрыть';
-    closeBtn.addEventListener('click', () => {
+    closeBtn.addEventListener('click', (event) => {
       //проверять есть ли сообщения
       newCheckbox.checked = false;
+      this.checkCom(newForm);
     })
     const sendBtn = document.createElement('input');
     sendBtn.classList.add('comments__submit');
@@ -216,6 +237,7 @@ class ImageEditor {
   showComForm() {
     const forms = document.querySelectorAll('.comments__marker-checkbox');
     for (let form of forms) {
+      this.checkCom(form.parentElement);
       form.checked = false;
     }
   }
@@ -379,6 +401,7 @@ class ImageEditor {
       });
       xhr.addEventListener("load", () => {
         this.imageInfo = JSON.parse(xhr.responseText);
+        sessionStorage.setItem('id', this.imageInfo.id);
         this.generateURL();
         this.showInnerEl({
           currentTarget: this.share
@@ -436,17 +459,23 @@ class ImageEditor {
     })
   }
   generateURL() {
-    //создавать чистую новую ссылку
-    this.menuUrl.value = window.location + '?id=' + this.imageInfo.id;
+    this.menuUrl.value = window.location.host + '?id=' + this.imageInfo.id;
   }
   isNew() {
     const linkEx = /id=/g;
+    const storage = sessionStorage.getItem('id');
 
     if(linkEx.test(window.location.href)) {
       let resultId  = window.location.search;
       resultId = resultId.replace('?id=', '');
 
       this.getImage(resultId)
+    } else if (storage) {
+      this.getImage(storage);
+      if (sessionStorage.getItem('menuPosLeft')) {
+        this.menu.style.left = sessionStorage.getItem('menuPosLeft') + 'px';
+        this.menu.style.top = sessionStorage.getItem('menuPosTop') + 'px';
+      }
     }
     this.startNew();
   }
@@ -509,6 +538,7 @@ class ImageEditor {
         this.refreshCanvas()
         this.showMenu();
       })
+      this.generateURL();
     });
   }
   checkAndMake(comment) {
@@ -523,6 +553,10 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
+      if (!this.isComment){
+        result.style.display = 'none';
+      }
+
     }
     result = result.querySelector('.comments__body');
     const newComment = this.newComment(comment.message, comment.timestamp);
@@ -530,6 +564,11 @@ class ImageEditor {
     loader = loader[loader.length - 1];
     result.insertBefore(newComment, loader);
     loader.style.display = 'none';
+  }
+  checkCom(form) {
+    if (form.querySelectorAll('.comment').length <= 1){
+      form.remove();
+    }
   }
 }
 
