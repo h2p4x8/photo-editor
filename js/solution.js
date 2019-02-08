@@ -524,7 +524,6 @@ class ImageEditor {
     socket.addEventListener('message', (event) => {
       let answer = JSON.parse(event.data);
       if (answer.event === 'comment') {
-        console.log('1')
         this.checkAndMake(answer.comment)
       } else if (answer.event === 'pic') {
         this.imageInfo = answer.pic;
