@@ -70,7 +70,7 @@ class ImageEditor {
       })
     })
     this.editor.addEventListener('click', (event)=>{
-      if (this.isComment && (event.target === this.editor || event.target === this.ctx)) {
+      if (this.isComment && (event.target === this.editor || event.target === this.ctx ||event.target === this.mask || event.target === this.image)) {
         this.showComForm();
         this.makeCommentForm(event, event.pageX, event.pageY);
       }
