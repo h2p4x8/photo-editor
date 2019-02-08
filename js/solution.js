@@ -101,6 +101,7 @@ class ImageEditor {
         this.refreshCanvas();
       })
     })
+    resize();
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
