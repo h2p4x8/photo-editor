@@ -524,6 +524,7 @@ class ImageEditor {
     socket.addEventListener('message', (event) => {
       let answer = JSON.parse(event.data);
       if (answer.event === 'comment') {
+        console.log('1')
         this.checkAndMake(answer.comment)
       } else if (answer.event === 'pic') {
         this.imageInfo = answer.pic;
@@ -547,6 +548,7 @@ class ImageEditor {
     xhr.send();
     xhr.addEventListener('loadend', () => {
       this.loader.style.display = 'none';
+      this.refreshCanvas();
     })
     xhr.addEventListener("load", () => {
       this.imageInfo = JSON.parse(xhr.responseText);
@@ -572,6 +574,9 @@ class ImageEditor {
   }
   checkAndMake(comment) {
     const comments = Array.from(document.querySelectorAll('.comments__form'));
+    const isShowCom = Array.from(this.menuToggle).find((el) => {
+      return el.checked === true;
+    })
     let result = comments.find(( el ) => {
       if ((el.style.left.replace('px', '') == comment.left) && (el.style.top.replace('px', '') == comment.top)) {
         return el;
@@ -582,7 +587,7 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
-      if (!this.isComment){
+      if (isShowCom.value === 'off'){
         result.style.display = 'none';
       }
 
