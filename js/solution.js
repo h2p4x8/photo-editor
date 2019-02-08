@@ -71,6 +71,7 @@ class ImageEditor {
     })
     this.editor.addEventListener('click', (event)=>{
       if (this.isComment && (event.target === this.editor || event.target === this.ctx)) {
+        this.showComForm();
         this.makeCommentForm(event, event.pageX, event.pageY);
       }
       return;
@@ -96,7 +97,6 @@ class ImageEditor {
       document.execCommand('copy');
     })
     window.addEventListener('resize', () => {
-      console.log('s')
       const resize = throttle(()=> {
         this.refreshCanvas();
       })
@@ -144,6 +144,16 @@ class ImageEditor {
       this.showError();
       return;
     }
+    if (this.imageInfo.id) {
+      document.querySelectorAll('.comments__form').forEach(( el ) => {
+        el.remove()
+      })
+      this.mask.src = './pic/clearMask.png';
+      this.ctx.getContext('2d').clearRect(0, 0, this.ctx.width, this.ctx.height);
+      sessionStorage.removeItem('id');
+      sessionStorage.removeItem('menuPosLeft');
+      sessionStorage.removeItem('menuPosTop');
+    }
 
     this.image.src = URL.createObjectURL(img);
     this.image.addEventListener('load', event => {
@@ -181,8 +191,6 @@ class ImageEditor {
     }
   }
   makeCommentForm(e) {
-    this.showComForm();
-
     const newForm = document.createElement('form');
     newForm.classList.add('comments__form');
 
@@ -259,10 +267,12 @@ class ImageEditor {
     const ctx = document.createElement('canvas');
     const mask = document.createElement('img');
 
+
     this.mask = mask;
     this.ctx = ctx;
 
     mask.style.position = ctx.style.position = 'absolute';
+    mask.src = './pic/clearMask.png';
 
     this.editor.appendChild(mask);
     this.editor.appendChild(ctx);
@@ -408,12 +418,14 @@ class ImageEditor {
       xhr.open('POST', 'https://neto-api.herokuapp.com/pic');
       xhr.addEventListener("loadstart", () => {
         this.loader.style.display = 'block';
+
       })
       xhr.send(post);
       xhr.addEventListener("loadend", () => {
         this.loader.style.display = 'none';
       });
       xhr.addEventListener("load", () => {
+        console.log('1')
         this.imageInfo = JSON.parse(xhr.responseText);
         sessionStorage.setItem('id', this.imageInfo.id);
         this.generateURL();
@@ -484,7 +496,7 @@ class ImageEditor {
       let resultId  = window.location.search;
       resultId = resultId.replace('?id=', '');
 
-      this.getImage(resultId)
+      this.getImage(resultId);
     } else if (storage) {
       this.getImage(storage);
       if (sessionStorage.getItem('menuPosLeft')) {
