@@ -100,7 +100,6 @@ class ImageEditor {
       const resize = throttle(()=> {
         this.refreshCanvas();
       })
-      resize();
     })
   }
   showError(isShow = true, isWrongType = true) {
@@ -144,15 +143,15 @@ class ImageEditor {
       this.showError();
       return;
     }
-    if (this.imageInfo.id) {
+    if (this.imageInfo) {
       document.querySelectorAll('.comments__form').forEach(( el ) => {
         el.remove()
       })
       this.mask.src = './pic/clearMask.png';
       this.ctx.getContext('2d').clearRect(0, 0, this.ctx.width, this.ctx.height);
-      sessionStorage.removeItem('id');
+      /*sessionStorage.removeItem('id');
       sessionStorage.removeItem('menuPosLeft');
-      sessionStorage.removeItem('menuPosTop');
+      sessionStorage.removeItem('menuPosTop');*/
     }
 
     this.image.src = URL.createObjectURL(img);
@@ -418,14 +417,12 @@ class ImageEditor {
       xhr.open('POST', 'https://neto-api.herokuapp.com/pic');
       xhr.addEventListener("loadstart", () => {
         this.loader.style.display = 'block';
-
       })
       xhr.send(post);
       xhr.addEventListener("loadend", () => {
         this.loader.style.display = 'none';
       });
       xhr.addEventListener("load", () => {
-        console.log('1')
         this.imageInfo = JSON.parse(xhr.responseText);
         sessionStorage.setItem('id', this.imageInfo.id);
         this.generateURL();
@@ -485,7 +482,6 @@ class ImageEditor {
     })
   }
   generateURL() {
-    console.log()
     this.menuUrl.value = 'https://' + window.location.host + '?id=' + this.imageInfo.id;
   }
   isNew() {
@@ -549,6 +545,9 @@ class ImageEditor {
       this.loader.style.display = 'block';
     })
     xhr.send();
+    xhr.addEventListener('loadend', () => {
+      this.loader.style.display = 'none';
+    })
     xhr.addEventListener("load", () => {
       this.imageInfo = JSON.parse(xhr.responseText);
       //картинка
@@ -564,12 +563,8 @@ class ImageEditor {
         this.mask.src = this.imageInfo.mask;
       }
       this.webSocket();
-      this.image.addEventListener('load', () => {
-        this.loader.style.display = 'none';
-        this.refreshCanvas()
-        this.showInnerEl({
-          currentTarget: this.commentsMode
-        })
+      this.showInnerEl({
+        currentTarget: this.commentsMode
       })
       this.generateURL();
 
