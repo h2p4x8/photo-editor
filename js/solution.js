@@ -486,7 +486,7 @@ class ImageEditor {
   }
   generateURL() {
     console.log()
-    this.menuUrl.value = window.location.host + '?id=' + this.imageInfo.id;
+    this.menuUrl.value = 'https://' + window.location.host + '?id=' + this.imageInfo.id;
   }
   isNew() {
     const linkEx = /id=/g;
