@@ -190,9 +190,6 @@ class ImageEditor {
       comments.forEach(el => el.style.display = 'block')
       this.isComment = true;
     }
-    comments.forEach((el) => {
-      el.querySelector('.comments__marker').checked = false;
-    })
   }
   makeCommentForm(e) {
     const newForm = document.createElement('form');
@@ -591,10 +588,9 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
-      if (isShowCom.value === 'off'){
-        result.style.display = 'none';
-      }
-
+    }
+    if (isShowCom.value === 'off'){
+      result.style.display = 'none';
     }
     result = result.querySelector('.comments__body');
     const newComment = this.newComment(comment.message, comment.timestamp);
@@ -602,6 +598,7 @@ class ImageEditor {
     loader = loader[loader.length - 1];
     result.insertBefore(newComment, loader);
     loader.style.display = 'none';
+    this.showComForm();
   }
   checkCom(form) {
     if (form.querySelectorAll('.comment').length <= 1){
