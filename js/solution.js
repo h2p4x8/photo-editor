@@ -34,7 +34,6 @@ class ImageEditor {
     this.registerEvents();
     this.makeCanvas();
     this.isNew();
-
   }
   registerEvents() {
     this.menu.addEventListener('mousedown', event => this.dragStart(event));
@@ -576,6 +575,7 @@ class ImageEditor {
       })
       this.generateURL();
       this.isComment = true;
+      this.refreshCanvas();
     });
   }
   checkAndMake(comment) {
