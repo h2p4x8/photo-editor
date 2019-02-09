@@ -577,7 +577,7 @@ class ImageEditor {
       this.generateURL();
       this.isComment = true;
     });
-    this.image('load', () => {
+    this.image.addEventListener('load', () => {
       this.refreshCanvas();
     })
   }
