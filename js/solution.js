@@ -433,7 +433,9 @@ class ImageEditor {
         })
         this.webSocket();
       });
-
+      xhr.addEventListener('error', () => {
+        console.log(xhr.responseText);
+      })
   }
   sendCom(message, form) {
     const post = 'message=' + encodeURIComponent(message) +
@@ -470,7 +472,7 @@ class ImageEditor {
       loader.style.display = 'none';
     });*/
     xhr.addEventListener("load", () => {
-      const result = JSON.parse(xhr.responseText);
+    const result = JSON.parse(xhr.responseText);
       this.imageInfo = result;
       /*const keys = Object.keys(result.comments)
       for (var i = 0; i < keys.length; i++) {
@@ -480,7 +482,7 @@ class ImageEditor {
       }*/
     });
     xhr.addEventListener('error', () => {
-      console.log('error');
+      console.log(xhr.responseText);
     })
   }
   generateURL() {
@@ -537,8 +539,10 @@ class ImageEditor {
         console.log(answer)
       }
     })
-
     //событие еррор
+    socket.addEventListener('error', () => {
+      console.log(error.message)
+    })
   }
   getImage(id) {
     const xhr = new XMLHttpRequest();
@@ -592,13 +596,16 @@ class ImageEditor {
     if (isShowCom.value === 'off'){
       result.style.display = 'none';
     }
+    if (!result.querySelector('.comments__marker-checkbox').checked) {
+      this.showComForm();
+    }
     result = result.querySelector('.comments__body');
     const newComment = this.newComment(comment.message, comment.timestamp);
     let loader = result.querySelectorAll('.comment');
     loader = loader[loader.length - 1];
     result.insertBefore(newComment, loader);
     loader.style.display = 'none';
-    this.showComForm();
+
   }
   checkCom(form) {
     if (form.querySelectorAll('.comment').length <= 1){
