@@ -344,6 +344,7 @@ class ImageEditor {
 
     this.ctx.addEventListener("mouseup", (evt) => {
       drawing = false;
+      sendMask();
     });
 
     this.ctx.addEventListener("mouseleave", (evt) => {
@@ -356,7 +357,6 @@ class ImageEditor {
         const point = [evt.offsetX, evt.offsetY]
         curves[curves.length - 1].push(point);
         needsRepaint = true;
-        sendMask();
       }
     });
 
