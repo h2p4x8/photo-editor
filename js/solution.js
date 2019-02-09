@@ -486,6 +486,7 @@ class ImageEditor {
   }
   generateURL() {
     this.menuUrl.value = 'https://' + window.location.host + '?id=' + this.imageInfo.id;
+    //this.menuUrl.value =window.location + '?id=' + this.imageInfo.id;
   }
   isNew() {
     const linkEx = /id=/g;
@@ -558,6 +559,9 @@ class ImageEditor {
       this.imageInfo = JSON.parse(xhr.responseText);
       //картинка
       this.image.src = this.imageInfo.url;
+      this.image.addEventListener('load', () => {
+        this.refreshCanvas();
+      })
       //добавляем комментарии
       if (this.imageInfo.comments) {
         const keys = Object.keys(this.imageInfo.comments)
@@ -594,6 +598,7 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
+      result.querySelector('.comments__marker-checkbox').checked = false;
     }
     if (isShowCom.value === 'off') {
       result.style.display = 'none';
