@@ -570,6 +570,7 @@ class ImageEditor {
         console.log('1')
         this.mask.src = this.imageInfo.mask;
       }
+      this.refreshCanvas();
       this.webSocket();
       this.showInnerEl({
         currentTarget: this.commentsMode
@@ -577,9 +578,6 @@ class ImageEditor {
       this.generateURL();
       this.isComment = true;
     });
-    this.image.addEventListener('load', () => {
-      this.refreshCanvas();
-    })
   }
   checkAndMake(comment) {
     const comments = Array.from(document.querySelectorAll('.comments__form'));
