@@ -576,8 +576,10 @@ class ImageEditor {
       })
       this.generateURL();
       this.isComment = true;
-      this.refreshCanvas();
     });
+    this.image('load', () => {
+      this.refreshCanvas();
+    })
   }
   checkAndMake(comment) {
     console.log('event')
