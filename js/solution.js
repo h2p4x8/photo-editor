@@ -592,12 +592,10 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
+      this.showComForm()
     }
     if (isShowCom.value === 'off'){
       result.style.display = 'none';
-    }
-    if (!result.querySelector('.comments__marker-checkbox').checked) {
-      this.showComForm();
     }
     result = result.querySelector('.comments__body');
     const newComment = this.newComment(comment.message, comment.timestamp);
