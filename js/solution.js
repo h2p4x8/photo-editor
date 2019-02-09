@@ -565,6 +565,7 @@ class ImageEditor {
         for (var i = 0; i < keys.length; i++) {
           this.checkAndMake(this.imageInfo.comments[keys[i]])
         }
+        this.showComForm();
       }
       if(this.imageInfo.mask) {
         this.mask.src = this.imageInfo.mask;
@@ -574,7 +575,7 @@ class ImageEditor {
         currentTarget: this.commentsMode
       })
       this.generateURL();
-
+      this.isComment = true;
     });
   }
   checkAndMake(comment) {
@@ -592,7 +593,6 @@ class ImageEditor {
         pageX: comment.left,
         pageY: comment.top
       })
-      this.showComForm()
     }
     if (isShowCom.value === 'off'){
       result.style.display = 'none';
