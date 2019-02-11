@@ -47,8 +47,11 @@ class ImageEditor {
     this.editor.addEventListener('dragover', event => event.preventDefault())
     this.editor.addEventListener('drop', ( event ) => {
       event.preventDefault();
-      if (this.image.src) {
+      if (this.imageInfo) {
         this.showError(true, false);
+        setTimeout(() => {
+          this.errorContainer.style.display = 'none';
+        }, 2000)
         return;
       }
       this.loadImage( event );
