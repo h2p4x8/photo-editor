@@ -153,9 +153,6 @@ class ImageEditor {
       })
       this.mask.src = './pic/clearMask.png';
       this.ctx.getContext('2d').clearRect(0, 0, this.ctx.width, this.ctx.height);
-      /*sessionStorage.removeItem('id');
-      sessionStorage.removeItem('menuPosLeft');
-      sessionStorage.removeItem('menuPosTop');*/
     }
 
     this.image.src = URL.createObjectURL(img);
