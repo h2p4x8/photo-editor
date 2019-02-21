@@ -36,8 +36,10 @@ class ImageEditor {
     this.isNew();
   }
   registerEvents() {
-    this.menu.addEventListener('mousedown', event => this.dragStart(event));
-    this.menu.addEventListener('mousemove', event => this.dragObj(event));
+    document.addEventListener('mousedown', event => this.dragStart(event));
+    document.addEventListener('mousemove', event => this.dragObj(event));
+    document.addEventListener('mouseup', event => this.dropMenu(event));
+    //this.drag.addEventListener('mouseout', this.dropMenu);
     this.menu.addEventListener('mouseup', () => {
       if ( this.dragTools.movedPiece ) {
         this.dragTools.movedPiece = null;
@@ -62,7 +64,7 @@ class ImageEditor {
         return;
       }
       el.addEventListener('click', event => this.showInnerEl(event))
-    });
+    })
     this.menuToggle.forEach((el) => {
       el.addEventListener('change', ()=>{
         if (el.checked) {
@@ -111,8 +113,8 @@ class ImageEditor {
     this.errorContainer.style.display = isShow ? 'block' : 'none';
   }
   dragStart( e ) {
-    if (e.target === this.drag) {
-      this.dragTools.movedPiece = this.menu;
+    if (e.target.classList.contains('drag')) {
+      this.dragTools.movedPiece = e.target.parentElement;
       const bounds = e.target.getBoundingClientRect();
       this.dragTools.shiftX = e.pageX - bounds.left - window.pageXOffset;
       this.dragTools.shiftY = e.pageY - bounds.top - window.pageYOffset;
@@ -136,6 +138,11 @@ class ImageEditor {
       this.dragTools.movedPiece.style.top = y + 'px';
       sessionStorage.setItem('menuPosLeft', x);
       sessionStorage.setItem('menuPosTop', y);
+    }
+  }
+  dropMenu(){
+    if ( this.dragTools.movedPiece ) {
+      this.dragTools.movedPiece = null;
     }
   }
   loadImage ( e ){
@@ -388,7 +395,16 @@ class ImageEditor {
 
     const message = document.createElement('p');
     message.classList.add('comment__message');
-    message.textContent = text;
+
+    text.split('\n').forEach((el) => {
+              if (!el) {
+                  message.appendChild(document.createElement('br'));
+              } else {
+                  message.appendChild(document.createTextNode(el));
+                  message.appendChild(document.createElement('br'));
+              }
+          })
+    message.removeChild(message.lastElementChild);
 
     comment.appendChild(time);
     comment.appendChild(message);
@@ -485,8 +501,10 @@ class ImageEditor {
     })
   }
   generateURL() {
-    this.menuUrl.value = 'https://' + window.location.host + '?id=' + this.imageInfo.id;
-    //this.menuUrl.value =window.location + '?id=' + this.imageInfo.id;
+    const regExp = /\?id=\S+/g;
+    let url = window.location.toString();
+    url = url.replace(regExp, '');
+    this.menuUrl.value = url + '?id=' + this.imageInfo.id;
   }
   isNew() {
     const linkEx = /id=/g;
@@ -618,7 +636,7 @@ class ImageEditor {
   }
 }
 
-let i = new ImageEditor( document.querySelector('.wrap') );
+new ImageEditor( document.querySelector('.wrap') );
 
 function debounce(callback, delay = 0) {
   let timeout;
