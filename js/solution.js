@@ -31,20 +31,22 @@ class ImageEditor {
     this.menuUrl = this.menu.querySelector('.menu__url');
     this.commentsMode = this.menu.querySelector('.comments');
     this.copyButton = this.menu.querySelector('.menu_copy');
+    this.resizeObserver = new ResizeObserver(entries => {
+          for (let entry of entries) {
+            if (entry.target.offsetHeight > 66) {
+               entry.target.style.left = (this.editor.offsetWidth - entry.target.offsetWidth) - 10 + 'px';
+            }
+          }
+    });
     this.registerEvents();
     this.makeCanvas();
     this.isNew();
+    this.resizeObserver.observe(this.menu);
   }
   registerEvents() {
     document.addEventListener('mousedown', event => this.dragStart(event));
     document.addEventListener('mousemove', event => this.dragObj(event));
-    document.addEventListener('mouseup', event => this.dropMenu(event));
-    //this.drag.addEventListener('mouseout', this.dropMenu);
-    this.menu.addEventListener('mouseup', () => {
-      if ( this.dragTools.movedPiece ) {
-        this.dragTools.movedPiece = null;
-      }
-    });
+    document.addEventListener('mouseup', event => this.dropMenu());
     this.downloadNew.addEventListener('change', event => this.loadImage(event))
     this.editor.addEventListener('dragover', event => event.preventDefault())
     this.editor.addEventListener('drop', ( event ) => {
@@ -106,7 +108,6 @@ class ImageEditor {
       })
       resize();
     })
-
   }
   showError(isShow = true, isWrongType = true) {
     this.errorMessage.textContent = isWrongType ? 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.' : 'Чтобы загрузить новое изображение, пожалуйста воспользуйтесь пунктом "Загрузить новое" в меню.'
@@ -136,12 +137,13 @@ class ImageEditor {
       y = Math.max(y, this.dragTools.minY);
       this.dragTools.movedPiece.style.left = x + 'px';
       this.dragTools.movedPiece.style.top = y + 'px';
-      sessionStorage.setItem('menuPosLeft', x);
-      sessionStorage.setItem('menuPosTop', y);
+      console.log(this.dragTools.movedPiece)
     }
   }
   dropMenu(){
     if ( this.dragTools.movedPiece ) {
+      sessionStorage.setItem('menuPosLeft', this.dragTools.movedPiece.style.left);
+      sessionStorage.setItem('menuPosTop', this.dragTools.movedPiece.style.top);
       this.dragTools.movedPiece = null;
     }
   }
@@ -518,8 +520,8 @@ class ImageEditor {
     } else if (storage) {
       this.getImage(storage);
       if (sessionStorage.getItem('menuPosLeft')) {
-        this.menu.style.left = sessionStorage.getItem('menuPosLeft') + 'px';
-        this.menu.style.top = sessionStorage.getItem('menuPosTop') + 'px';
+        this.menu.style.left = sessionStorage.getItem('menuPosLeft');
+        this.menu.style.top = sessionStorage.getItem('menuPosTop');
       }
     }
     this.startNew();
@@ -637,6 +639,7 @@ class ImageEditor {
 }
 
 new ImageEditor( document.querySelector('.wrap') );
+
 
 function debounce(callback, delay = 0) {
   let timeout;
