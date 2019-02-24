@@ -35,6 +35,7 @@ class ImageEditor {
           for (let entry of entries) {
             if (entry.target.offsetHeight > 66) {
                entry.target.style.left = (this.editor.offsetWidth - entry.target.offsetWidth) - 10 + 'px';
+             }
           }
     });
     this.registerEvents();
