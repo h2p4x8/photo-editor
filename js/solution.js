@@ -35,7 +35,6 @@ class ImageEditor {
           for (let entry of entries) {
             if (entry.target.offsetHeight > 66) {
                entry.target.style.left = (this.editor.offsetWidth - entry.target.offsetWidth) - 10 + 'px';
-            }
           }
     });
     this.registerEvents();
@@ -121,7 +120,7 @@ class ImageEditor {
       this.dragTools.shiftY = e.pageY - bounds.top - window.pageYOffset;
       this.dragTools.minY = this.editor.offsetTop;
       this.dragTools.minX = this.editor.offsetLeft;
-      this.dragTools.maxX = this.editor.offsetLeft + this.editor.offsetWidth - this.dragTools.movedPiece.offsetWidth;
+      this.dragTools.maxX = this.editor.offsetLeft + this.editor.offsetWidth - this.dragTools.movedPiece.offsetWidth - 1;
       this.dragTools.maxY = this.editor.offsetTop + this.editor.offsetHeight - this.dragTools.movedPiece.offsetHeight;
     }
   }
@@ -137,7 +136,6 @@ class ImageEditor {
       y = Math.max(y, this.dragTools.minY);
       this.dragTools.movedPiece.style.left = x + 'px';
       this.dragTools.movedPiece.style.top = y + 'px';
-      console.log(this.dragTools.movedPiece)
     }
   }
   dropMenu(){
