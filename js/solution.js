@@ -33,13 +33,13 @@ class ImageEditor {
     this.copyButton = this.menu.querySelector('.menu_copy');
     this.resizeObserver = new ResizeObserver(entries => {
           for (let entry of entries) {
-            if (entry.target.offsetHeight > 66) {
+            while (entry.target.offsetHeight > 66) {
                entry.target.style.left = (this.editor.offsetWidth - entry.target.offsetWidth) - 10 + 'px';
-             }
+            }
           }
     });
-    this.registerEvents();
     this.makeCanvas();
+    this.registerEvents();
     this.isNew();
     this.resizeObserver.observe(this.menu);
   }
@@ -75,15 +75,18 @@ class ImageEditor {
         return;
       })
     })
-    this.editor.addEventListener('click', (event)=>{
-      if (this.isComment && (event.target === this.editor || event.target === this.ctx ||event.target === this.mask || event.target === this.image)) {
+    document.addEventListener('click', (event)=>{
+      if (this.isComment && event.target === this.comBox) {
+        console.log(event.target)
         this.showComForm();
-        this.makeCommentForm(event, event.pageX, event.pageY);
+        this.makeCommentForm(event);
       }
       return;
     })
     this.draw.addEventListener('click', () => {
       this.isDrawing = true;
+      this.comBox.style.zIndex = 0;
+      this.ctx.style.zIndex = 1;
       const color = Array.from(this.drawTools).find( el => el.checked);
       this.drawing(color.value);
     })
@@ -96,17 +99,13 @@ class ImageEditor {
     }
     this.commentsMode.addEventListener('click', ()=>{
       this.isComment = true;
+      this.comBox.style.zIndex = 1;
+      this.ctx.style.zIndex = 0;
     })
     this.copyButton.addEventListener('click', () => {
       event.preventDefault();
       this.menuUrl.select();
       document.execCommand('copy');
-    })
-    window.addEventListener('resize', () => {
-      const resize = throttle(()=> {
-        this.refreshCanvas();
-      })
-      resize();
     })
   }
   showError(isShow = true, isWrongType = true) {
@@ -181,6 +180,7 @@ class ImageEditor {
     })
   }
   showInnerEl( e ) {
+    const prevW = this.menu.offsetWidth;
     this.burgerButton.style.display = 'inline-block';
     this.modeButtons.forEach( (el) => {
       el.style.display = 'none';
@@ -202,11 +202,15 @@ class ImageEditor {
     const newForm = document.createElement('form');
     newForm.classList.add('comments__form');
 
-    var x = e.pageX,
-        y = e.pageY;
+    const left = e.offsetX;
+    const top = e.offsetY;
 
-    newForm.style.left = x + 'px';
-    newForm.style.top = y + 'px';
+    newForm.style.cssText = `
+        top: ${top}px;
+        left: ${left}px;
+        `;
+    newForm.dataset.left = left;
+    newForm.dataset.top = top;
 
     const newSpan = document.createElement('span');
     newSpan.classList.add('comments__marker');
@@ -260,7 +264,7 @@ class ImageEditor {
     newComBody.appendChild(sendBtn);
 
 
-    this.editor.appendChild(newForm);
+    this.comBox.appendChild(newForm);
 
     return newForm;
   }
@@ -272,27 +276,32 @@ class ImageEditor {
     }
   }
   makeCanvas() {
-    const ctx = document.createElement('canvas');
-    const mask = document.createElement('img');
-
+    const ctx = document.createElement('canvas'),
+          mask = document.createElement('img'),
+          comBox = document.createElement('div');
 
     this.mask = mask;
     this.ctx = ctx;
+    this.comBox = comBox;
 
-    mask.style.position = ctx.style.position = 'absolute';
+    comBox.style.cssText = ctx.style.cssText = mask.style.cssText = `
+        position: absolute;
+        left: 50%;
+        top:50%;
+        transform: translate(-50%, -50%);
+    `;
+
     mask.src = './pic/clearMask.png';
 
     this.editor.appendChild(mask);
     this.editor.appendChild(ctx);
-
+    this.editor.appendChild(comBox);
   }
   refreshCanvas() {
-    const bounds = this.image.getBoundingClientRect();
-
-    this.ctx.style.top = this.mask.style.top = bounds.top + 'px';
-    this.ctx.style.left = this.mask.style.left = bounds.left + 'px';
     this.ctx.width = this.mask.width = this.image.offsetWidth;
     this.ctx.height = this.mask.height = this.image.offsetHeight;
+    this.comBox.style.height = this.image.offsetHeight + 'px';
+    this.comBox.style.width = this.image.offsetWidth + 'px';
   }
   drawing(color) {
     const canvas = this.ctx;
@@ -455,7 +464,8 @@ class ImageEditor {
   }
   sendCom(message, form) {
     const post = 'message=' + encodeURIComponent(message) +
-    '&left=' + encodeURIComponent(form.style.left.replace('px', '')) + '&top=' + encodeURIComponent(form.style.top.replace('px', ''));
+    '&left=' + encodeURIComponent(form.dataset.left) + '&top=' + encodeURIComponent(form.dataset.top);
+    console.log(post);
 
     /*fetch(`https://neto-api.herokuapp.com/pic/${this.imageInfo.id}/comments`, {
       method: 'POST',
@@ -488,7 +498,7 @@ class ImageEditor {
       loader.style.display = 'none';
     });*/
     xhr.addEventListener("load", () => {
-    const result = JSON.parse(xhr.responseText);
+      const result = JSON.parse(xhr.responseText);
       this.imageInfo = result;
       /*const keys = Object.keys(result.comments)
       for (var i = 0; i < keys.length; i++) {
@@ -523,20 +533,6 @@ class ImageEditor {
         this.menu.style.top = sessionStorage.getItem('menuPosTop');
       }
     }
-    this.startNew();
-  }
-  startNew() {
-    this.burgerButton.style.display = 'none';
-    this.modeButtons.forEach((el) => {
-      if (el.classList.contains('new')) {
-          return;
-      }
-      el.style.display = 'none'
-    })
-    this.image.src = '';
-    document.querySelectorAll('.comments__form').forEach(( el ) => {
-      el.remove()
-    })
   }
   webSocket() {
     var socket = this.socket = new WebSocket(`wss://neto-api.herokuapp.com/pic/${this.imageInfo.id}`);
@@ -572,7 +568,6 @@ class ImageEditor {
     xhr.send();
     xhr.addEventListener('loadend', () => {
       this.loader.style.display = 'none';
-      this.refreshCanvas();
     })
     xhr.addEventListener("load", () => {
       this.imageInfo = JSON.parse(xhr.responseText);
@@ -580,17 +575,16 @@ class ImageEditor {
       this.image.src = this.imageInfo.url;
       this.image.addEventListener('load', () => {
         this.refreshCanvas();
+        if (this.imageInfo.comments) {
+          const keys = Object.keys(this.imageInfo.comments)
+          for (var i = 0; i < keys.length; i++) {
+            this.checkAndMake(this.imageInfo.comments[keys[i]])
+          }
+          this.showComForm();
+        }
       })
       //добавляем комментарии
-      if (this.imageInfo.comments) {
-        const keys = Object.keys(this.imageInfo.comments)
-        for (var i = 0; i < keys.length; i++) {
-          this.checkAndMake(this.imageInfo.comments[keys[i]])
-        }
-        this.showComForm();
-      }
       if(this.imageInfo.mask) {
-        console.log('1')
         this.mask.src = this.imageInfo.mask;
       }
       this.refreshCanvas();
@@ -608,14 +602,14 @@ class ImageEditor {
       return el.checked === true;
     })
     let result = comments.find(( el ) => {
-      if ((el.style.left.replace('px', '') == comment.left) && (el.style.top.replace('px', '') == comment.top)) {
+      if ((el.dataset.left == comment.left) && (el.dataset.top == comment.top)) {
         return el;
       }
     })
     if (!result) {
       result = this.makeCommentForm({
-        pageX: comment.left,
-        pageY: comment.top
+        offsetX: comment.left,
+        offsetY: comment.top
       })
       result.querySelector('.comments__marker-checkbox').checked = false;
     }

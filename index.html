@@ -12,7 +12,7 @@
       <ul class="menu">
         <li class="menu__item drag"></li>
 
-        <li class="menu__item burger">
+        <li class="menu__item burger" style="display: none;">
           <i class="burger-icon"></i>
         </li>
 
@@ -22,7 +22,7 @@
           <input type="file" id="fileInput">
         </label>
 
-        <li class="menu__item mode comments" data-state="">
+        <li class="menu__item mode comments" style="display: none;">
           <i class="menu__icon comments-icon"></i>
           <span class="menu__item-title">Комментарии</span>
         </li>
@@ -34,7 +34,7 @@
           </span>
         </li>
 
-        <li class="menu__item mode draw" data-state="">
+        <li class="menu__item mode draw" style="display: none;">
           <i class="menu__icon draw-icon"></i>
           <span class="menu__item-title">Рисовать</span>
         </li>
@@ -46,7 +46,7 @@
           <input class="menu__color purple" type="radio" name="color" value="#b36ade"><span></span>
         </li>
 
-        <li class="menu__item mode share" data-state="">
+        <li class="menu__item mode share" style="display: none;">
           <i class="menu__icon share-icon"></i>
           <span class="menu__item-title">Поделиться</span>
         </li>
@@ -56,7 +56,7 @@
         </li>
       </ul>
 
-      <img class="current-image" src="./pic/image.jpg">
+      <img class="current-image" src="">
 
       <div class="error" style="display: none;">
         <h4 class="error__header">Ошибка</h4>
@@ -73,36 +73,6 @@
         </div>
         <p class="image-loader__message">Загружаю изображение...</p>
       </div>
-
-      <form class="comments__form">
-        <span class="comments__marker"></span><input type="checkbox" class="comments__marker-checkbox">
-        <div class="comments__body">
-          <div class="comment">
-            <p class="comment__time">28.02.18 19:09:33</p>
-            <p class="comment__message">Здесь будет комментарий</p>
-          </div>
-          <div class="comment">
-            <p class="comment__time">28.02.18 19:11:01</p>
-            <p class="comment__message">А здесь будет многострочный комментарий, строки на 2 хотя бы.</p>
-          </div>
-          <div class="comment">
-            <p class="comment__time">28.02.18 23:58:01</p>
-            <p class="comment__message">А когда они будут?</p>
-          </div>
-          <div class="comment">
-            <div class="loader">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <textarea class="comments__input" type="text" placeholder="Напишите ответ..."></textarea>
-          <input class="comments__close" type="button" value="Закрыть">
-          <input class="comments__submit" type="submit" value="Отправить">
-        </div>
-      </form>
 
     </div>
   </body>
